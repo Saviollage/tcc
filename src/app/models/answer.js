@@ -15,30 +15,11 @@ const AnswerSchema = new mongoose.Schema({
         default: Date.now
     },
 
-    /*  PONTOS DE RESPOSTA */
-    
-    excited: {
+    questionId: {
         type: Number
     },
-    immersed: {
-        type: Number
-    },
-    controlled: {
-        type: Number
-    },
-    relaxed: {
-        type: Number
-    },
-    bored: {
-        type: Number
-    },
-    apathetic: {
-        type: Number
-    },
-    worried: {
-        type: Number
-    },
-    anxious: {
+
+    answer: {
         type: Number
     }
 });

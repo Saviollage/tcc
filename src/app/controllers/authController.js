@@ -45,6 +45,7 @@ router.post("/authenticate", async (req, res) => {
 
     //Como o password em /models/User.js está com select false para nao aparecer em requisições publicas,
     // adicionamos a função .select() passando o password como parametro para ser retornado pela API
+    
     const user = await User.findOne({ email }).select("+password");
 
     //Verifica se o email está correto

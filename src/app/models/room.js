@@ -37,7 +37,7 @@ const RoomSchema = new mongoose.Schema({
         default: 0
     },
 
-    sprints: [{
+    moments: [{
         type: Date
     }],
 });

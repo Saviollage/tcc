@@ -1,6 +1,6 @@
 const mongoose = require("../../database");
 
-const SprintSchema = new mongoose.Schema({
+const MomentSchema = new mongoose.Schema({
     roomId: {
         type: String
     },
@@ -10,7 +10,7 @@ const SprintSchema = new mongoose.Schema({
         default: Date.now
     },
 
-    sprintIndex: {
+    momentIndex: {
         type: Number
     },
 
@@ -55,7 +55,7 @@ const SprintSchema = new mongoose.Schema({
     }
 });
 
-//Apos definir o model Sprint, declara como um Schema do Mongo
-const Sprint = mongoose.model("Sprint", SprintSchema);
+//Apos definir o model Moment, declara como um Schema do Mongo
+const Moment = mongoose.model("Moment", MomentSchema);
 
-module.exports = Sprint;
+module.exports = Moment;

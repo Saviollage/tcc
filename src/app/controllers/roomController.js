@@ -1,6 +1,6 @@
 const express = require("express");
 const Room = require("../models/room");
-const Answer = require("../models/answer");
+const Moment = require("../models/moment");
 const User = require("../models/user");
 
 const router = express.Router();
@@ -16,6 +16,15 @@ router.post("/createRoom", async (req, res) => {
 
         /*  CASO USUÁRIO EXISTA, SISTEMA PROSSEGUE PARA A CRIAÇÃO DA SALA */
         const room = await Room.create(req.body);
+        const moment = await Moment.create({
+            roomId: room._id,
+            email: room.createdBy
+        });
+
+        room.moments.push(moment.createdAt);
+        moment.momentIndex = 0;
+        await moment.save();
+        await room.save();
 
         return res.send({ message: "Room recorded successfully", room });
 
@@ -71,6 +80,11 @@ router.delete("/:roomId", async (req, res) => {
         if (room == undefined)
             return res.status(400).send({ error: "Room not found" });
 
+
+        const moments = await Moment.find({ roomId: room._id })
+
+        for (var i = 0; i < moments.length; i++)
+            await moments[i].remove();
         await room.remove();
 
         return res.send({ message: "Room '" + room.name + "' removed" });

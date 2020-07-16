@@ -1,13 +1,13 @@
 const express = require("express");
 const Room = require("../models/room");
 const Answer = require("../models/answer");
+const Moment = require("../models/moment");
 
 const router = express.Router();
 
-
 router.post("/new", async (req, res) => {
 
-    const { roomId, participant } = req.body;
+    const { roomId, participant, questionId, answer } = req.body;
 
     try {
 
@@ -21,6 +21,12 @@ router.post("/new", async (req, res) => {
 
         const answer = await Answer.create(req.body);
 
+        const moment = await Moment.findOne({ roomId: roomId, createdAt: room.moments[room.moments.length - 1] });
+        
+        moment.totalAnswers += 1;
+
+        await moment.save();
+        
         return res.send({ answer, message: "Answer recorded successfully" });
 
     } catch (err) {

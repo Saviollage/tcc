@@ -6,8 +6,10 @@ const cors = require("cors");
 const app = express();
 
 app.use(cors());
+
 //Fazendo o app aceitar parametros json
 app.use(express.json());
+
 //Fazendo o app aceitar os parametros pela URL
 app.use(express.urlencoded({ extended: false }));
 
@@ -21,4 +23,4 @@ port = process.env.PORT;
 //Rodar o app em uma porta (nesse caso, 3000)
 app.listen(port);
 
-console.log("Server running on port " + port)
+console.log("Server running on port " + port);
