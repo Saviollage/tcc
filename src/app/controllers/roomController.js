@@ -2,6 +2,7 @@ const express = require("express");
 const Room = require("../models/room");
 const Moment = require("../models/moment");
 const User = require("../models/user");
+const Answer = require("../models/answer");
 
 const router = express.Router();
 
@@ -81,7 +82,13 @@ router.delete("/:roomId", async (req, res) => {
             return res.status(400).send({ error: "Room not found" });
 
 
-        const moments = await Moment.find({ roomId: room._id })
+        const moments = await Moment.find({ roomId: room._id });
+
+        const answers = await Answer.find({ roomId: room._id });
+
+
+        for (var i = 0; i < answers.length; i++)
+            await answers[i].remove();
 
         for (var i = 0; i < moments.length; i++)
             await moments[i].remove();
@@ -90,7 +97,7 @@ router.delete("/:roomId", async (req, res) => {
         return res.send({ message: "Room '" + room.name + "' removed" });
 
     } catch (err) {
-        ;
+
         return res.status(400).send({ error: "Room delete failed" });
     }
 });

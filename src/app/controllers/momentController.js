@@ -50,10 +50,28 @@ router.post("/createMoment", async (req, res) => {
 
 router.get("/", async (req, res) => {
     try {
-        /*  VERIFICA PRESENÇA DO USUARIO NO SISTEMA */
         const moments = await Moment.find();
 
         return res.send({ moments });
+
+    } catch (err) {
+
+        return res.status(400).send({ error: "Moments list failed" });
+    }
+});
+
+
+router.get("/byRoom/:roomId", async (req, res) => {
+    try {
+
+        const room = await Room.findById(req.params.roomId);
+        if (room == undefined)
+            return res.status(400).send({ error: "Room not found" });
+
+        const moments = await Moment.find({ roomId: req.params.roomId });
+
+
+        return res.json(moments);
 
     } catch (err) {
 
