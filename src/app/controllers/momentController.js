@@ -10,7 +10,7 @@ router.post("/createMoment", async (req, res) => {
     const { roomId, email } = req.body;
 
     try {
-        /*  Verifica sala no sistema */
+
         const room = await Room.findById(roomId);
 
         if (room == undefined)
@@ -19,7 +19,6 @@ router.post("/createMoment", async (req, res) => {
         if (!room.active)
             return res.status(400).send({ error: "Room closed" });
 
-        /*  Verifica usuário no sistema */
         const user = await User.findOne({ email: email });
 
         if (user == undefined)
@@ -29,12 +28,11 @@ router.post("/createMoment", async (req, res) => {
             return res.status(400).send({ error: "User not have permission" });
 
 
-        /*  Cria o moment */
         const moment = await Moment.create(req.body);
 
-        /*  Aloca o moment no vetor da sala */
+
         room.moments.push(moment.createdAt);
-        moment.momentIndex = room.moments.length + 1;
+        moment.momentIndex = room.moments.length - 1;
         await room.save();
         await moment.save();
 
@@ -78,5 +76,6 @@ router.get("/byRoom/:roomId", async (req, res) => {
         return res.status(400).send({ error: "Moments list failed" });
     }
 });
-//Utiliza o app que mandamos pro controller no index.js, aqui estamos repassando o router para o app com o prefixo '/room'
+
+
 module.exports = app => app.use("/moment", router);

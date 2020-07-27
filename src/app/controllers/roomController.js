@@ -3,8 +3,23 @@ const Room = require("../models/room");
 const Moment = require("../models/moment");
 const User = require("../models/user");
 const Answer = require("../models/answer");
+const { listIndexes } = require("../models/room");
+const Participant = require("../models/participant");
 
 const router = express.Router();
+
+/*
+TODO:
+
+> ADICIONAR PIN PARA SALA (Gerar código 6)
+
+> VERIFICAR PARTICIPANTES DA SALA (PESSOAS QUE RESPONDERAM PARA AQUELA DETERMINADA SALA)
+*/
+
+function generatePinCode() {
+    var value = Math.floor(Math.random() * 8999999 + 1000000);
+    return value.toString();
+}
 
 router.post("/createRoom", async (req, res) => {
     const { name, createdBy } = req.body;
@@ -15,13 +30,18 @@ router.post("/createRoom", async (req, res) => {
         if (user == undefined)
             return res.status(400).send({ error: "User not found" });
 
+        const data = req.body;
+
+
         /*  CASO USUÁRIO EXISTA, SISTEMA PROSSEGUE PARA A CRIAÇÃO DA SALA */
         const room = await Room.create(req.body);
+
         const moment = await Moment.create({
             roomId: room._id,
             email: room.createdBy
         });
 
+        room.pin = generatePinCode();
         room.moments.push(moment.createdAt);
         moment.momentIndex = 0;
         await moment.save();
@@ -37,12 +57,10 @@ router.post("/createRoom", async (req, res) => {
 
 // LISTAR TODAS AS SALAS
 router.get("/all", async (req, res) => {
-
     try {
         /*  VERIFICA PRESENÇA DO USUARIO NO SISTEMA */
         const rooms = await Room.find();
-
-        return res.send({ rooms });
+        return res.json(rooms);
 
     } catch (err) {
 
@@ -51,23 +69,15 @@ router.get("/all", async (req, res) => {
 });
 
 // DETALHAR SALA
-router.get("/:roomId", async (req, res) => {
+router.get("/:roomPin", async (req, res) => {
     try {
-        //Retorna a sala cuja id foi requisitada  
-        const room = await Room.findById(
-            req.params.roomId,
-            {
-                //Apenas para tirar o DeprecationWarning que aparecia
-                useFindAndModify: false
-            }
-        );
-
+        const pin = req.params.roomPin;
+        const room = await Room.findOne({ pin: pin });
         if (room == undefined)
             return res.status(400).send({ error: "Room not found" })
 
-        return res.send(room);
+        return res.json(room);
     } catch (err) {
-
         return res.status(400).send({ error: "Error listing room detail" });
     }
 });
@@ -86,6 +96,10 @@ router.delete("/:roomId", async (req, res) => {
 
         const answers = await Answer.find({ roomId: room._id });
 
+        const participants = await Participant.find({ roomPin: room.pin})
+
+        for (var i = 0; i < participants.length; i++)
+            await participants[i].remove();
 
         for (var i = 0; i < answers.length; i++)
             await answers[i].remove();
@@ -102,6 +116,14 @@ router.delete("/:roomId", async (req, res) => {
     }
 });
 
+
+router.post('/newParticipant', async (req, res) => {
+    try {
+
+    } catch (err) {
+        return res.status(400).send({ error: "Add participant failed" });
+    }
+});
 
 
 //Utiliza o app que mandamos pro controller no index.js, aqui estamos repassando o router para o app com o prefixo '/room'

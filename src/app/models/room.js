@@ -9,6 +9,10 @@ const RoomSchema = new mongoose.Schema({
         default: true
     },
 
+    pin: {
+        type: String
+    },
+
     name: {
         type: String,
         required: true
@@ -28,9 +32,10 @@ const RoomSchema = new mongoose.Schema({
         default: Date.now
     },
 
-    participants: [{
-        type: String
-    }],
+    quantParticipants: {
+        type: Number, 
+        default: 0
+    },
 
     quantAnswers: {
         type: Number,

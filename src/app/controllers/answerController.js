@@ -2,6 +2,7 @@ const express = require("express");
 const Room = require("../models/room");
 const Answer = require("../models/answer");
 const Moment = require("../models/moment");
+const Participant = require("../models/participant");
 
 const router = express.Router();
 
@@ -19,6 +20,13 @@ router.post("/new", async (req, res) => {
         if (!room.active)
             return res.status(400).send({ error: "Room closed" });
 
+
+        const p = await Participant.findById(participant);
+
+        if (p == undefined)
+            return res.status(400).send({ error: "Participant not found" });
+
+
         const answer = await Answer.create(req.body);
 
         const moment = await Moment.findOne({ roomId: roomId, createdAt: room.moments[room.moments.length - 1] });
@@ -26,6 +34,10 @@ router.post("/new", async (req, res) => {
         moment.totalAnswers += 1;
 
         await moment.save();
+
+        room.quantAnswers++;
+
+        await room.save();
 
         return res.send({ answer, message: "Answer recorded successfully" });
 
@@ -82,7 +94,7 @@ router.get("/byRoom/:roomId/:momentIndex", async (req, res) => {
 
         const answers = await Answer.find({ roomId: req.params.roomId, createdAt: { $gte: moment.createdAt } });
 
-        return res.json({moment: moment, answers: answers});
+        return res.json({ moment: moment, answers: answers });
 
     } catch (err) {
         console.log(err)
