@@ -96,7 +96,7 @@ router.delete("/:roomId", async (req, res) => {
 
         const answers = await Answer.find({ roomId: room._id });
 
-        const participants = await Participant.find({ roomPin: room.pin})
+        const participants = await Participant.find({ roomPin: room.pin })
 
         for (var i = 0; i < participants.length; i++)
             await participants[i].remove();
@@ -116,15 +116,42 @@ router.delete("/:roomId", async (req, res) => {
     }
 });
 
-
-router.post('/newParticipant', async (req, res) => {
+// DETALHAR SALA
+router.get("/activate/:roomId", async (req, res) => {
     try {
+        const id = req.params.roomId;
+        const room = await Room.findById(id);
+        if (room == undefined)
+            return res.status(400).send({ error: "Room not found" })
 
+        room.active = true;
+        await room.save();
+
+        return res.send({ message: "Room activeted" });
     } catch (err) {
-        return res.status(400).send({ error: "Add participant failed" });
+        return res.status(400).send({ error: "Error listing room detail" });
     }
 });
 
+// DETALHAR SALA
+router.get("/desactivate/:roomId", async (req, res) => {
+    try {
+        const id = req.params.roomId;
+        const room = await Room.findById(id);
+        if (room == undefined)
+            return res.status(400).send({ error: "Room not found" })
+        room.active = false;
+        room.closedAt = Date.now();
+        room.duration = new Date(room.closedAt - room.createdAt).getTime();
+
+        await room.save();
+
+        return res.send({ message: "Room deactivated" });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({ error: "Error listing room detail" });
+    }
+});
 
 //Utiliza o app que mandamos pro controller no index.js, aqui estamos repassando o router para o app com o prefixo '/room'
 module.exports = app => app.use("/room", router);

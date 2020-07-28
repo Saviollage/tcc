@@ -45,6 +45,14 @@ const RoomSchema = new mongoose.Schema({
     moments: [{
         type: Date
     }],
+
+    closedAt: {
+        type: Date
+    },
+
+    duration: {
+        type: Date
+    }
 });
 
 //Apos definir o model room, declara como um Schema do Mongo
