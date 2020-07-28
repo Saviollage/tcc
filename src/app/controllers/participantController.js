@@ -19,7 +19,7 @@ router.post("/new", async (req, res) => {
         if (!room.active)
             return res.status(400).send({ error: "Room closed" });
 
-        const particpantSearch = await Participant.find({
+        const particpantSearch = await Participant.findOne({
             roomPin: room.pin,
             code: code
         });
@@ -33,11 +33,10 @@ router.post("/new", async (req, res) => {
             return res.send({ participant, message: "Participant recorded successfully" });
 
         }
-        else
-        {
+        else {
             const participant = particpantSearch;
-        
-            return res.send({ participant, message: "Participant founded successfully" });
+
+            return res.send({ participant, room, message: "Participant founded successfully" });
         }
 
     } catch (err) {
@@ -75,6 +74,7 @@ router.get("/byRoom/:roomId", async (req, res) => {
         return res.json(participants);
 
     } catch (err) {
+
         return res.status(400).send({ error: "Participant list failed" });
     }
 });
