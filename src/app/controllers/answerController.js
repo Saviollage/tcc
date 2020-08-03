@@ -46,6 +46,52 @@ router.post("/new", async (req, res) => {
     }
 });
 
+router.post("/newList", async (req, res) => {
+
+    const { roomId, participant, answers } = req.body;
+
+    try {
+
+        const room = await Room.findById(roomId);
+
+        if (room == undefined)
+            return res.status(400).send({ error: "Room not found" });
+
+        if (!room.active)
+            return res.status(400).send({ error: "Room closed" });
+
+
+        const p = await Participant.findById(participant);
+
+        if (p == undefined)
+            return res.status(400).send({ error: "Participant not found" });
+
+        for (const answer of answers) {
+            var data = answer;
+            data['roomId'] = roomId;
+            data['participant'] = participant;
+
+            await Answer.create(data);
+        }
+
+
+        const moment = await Moment.findOne({ roomId: roomId, createdAt: room.moments[room.moments.length - 1] });
+
+        moment.totalAnswers += 1;
+
+        await moment.save();
+
+        room.quantAnswers++;
+
+        await room.save();
+
+        return res.send({ message: `${answers.length} Answers recorded successfully` });
+
+    } catch (err) {
+        return res.status(400).send({ error: "Answers registration failed" });
+    }
+});
+
 router.get("/", async (req, res) => {
 
     try {

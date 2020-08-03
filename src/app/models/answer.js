@@ -16,7 +16,7 @@ const AnswerSchema = new mongoose.Schema({
     },
 
     questionId: {
-        type: String
+        type: Number
     },
 
     answer: {
