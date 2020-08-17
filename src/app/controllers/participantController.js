@@ -30,7 +30,7 @@ router.post("/new", async (req, res) => {
             room.quantParticipants++;
             await room.save();
 
-            return res.send({ participant, message: "Participant recorded successfully" });
+            return res.send({ participant, room, message: "Participant recorded successfully" });
 
         }
         else {
