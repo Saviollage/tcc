@@ -5,6 +5,7 @@ const User = require("../models/user");
 const Answer = require("../models/answer");
 const { listIndexes } = require("../models/room");
 const Participant = require("../models/participant");
+const authMiddlware = require('../middlewares/auth')
 
 const router = express.Router();
 
@@ -60,6 +61,21 @@ router.get("/all", async (req, res) => {
     try {
         /*  VERIFICA PRESENÇA DO USUARIO NO SISTEMA */
         const rooms = await Room.find();
+        return res.json(rooms);
+
+    } catch (err) {
+
+        return res.status(400).send({ error: "Room list failed" });
+    }
+});
+
+// LISTAR TODAS AS SALAS
+router.get("/my", authMiddlware, async (req, res) => {
+    try {
+        /*  VERIFICA PRESENÇA DO USUARIO NO SISTEMA */
+        const rooms = await Room.find({
+            createdBy: req.userId
+        });
         return res.json(rooms);
 
     } catch (err) {
