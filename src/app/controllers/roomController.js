@@ -72,9 +72,11 @@ router.get("/all", async (req, res) => {
 // LISTAR TODAS AS SALAS
 router.get("/my", authMiddlware, async (req, res) => {
     try {
-        /*  VERIFICA PRESENÇA DO USUARIO NO SISTEMA */
+        const user = await User.findById(req.userId)
+        if (!user)
+            return res.status(403).send({ error: 'user not found' })
         const rooms = await Room.find({
-            createdBy: req.userId
+            createdBy: user.email
         });
         return res.json(rooms);
 
