@@ -21,6 +21,10 @@ const AnswerSchema = new mongoose.Schema({
 
     answer: {
         type: Number
+    },
+
+    zScore: {
+        type: Number
     }
 });
 

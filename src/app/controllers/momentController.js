@@ -3,6 +3,7 @@ const Room = require("../models/room");
 const Answer = require("../models/answer");
 const User = require("../models/user");
 const Moment = require("../models/moment");
+const MomentService = require('../services/momentService')
 
 const router = express.Router();
 
@@ -57,6 +58,18 @@ router.get("/", async (req, res) => {
         return res.status(400).send({ error: "Moments list failed" });
     }
 });
+
+router.post('/sync', async (req, res) => {
+    try {
+        return res.send(await MomentService.populateData({
+            momentId: req.body.momentId,
+            roomId: req.body.roomId
+        }));
+    } catch (err) {
+
+        return res.status(400).send({ error: "Sync moments list failed" });
+    }
+})
 
 
 router.get("/byRoom/:roomId", async (req, res) => {

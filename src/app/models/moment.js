@@ -19,6 +19,27 @@ const MomentSchema = new mongoose.Schema({
         default: 0
     },
 
+    questions:
+        [{
+            questionId: {
+                type: Number
+            },
+            avg: {
+                type: Number,
+                default: 0
+            },
+
+            std: {
+                type: Number,
+                default: 0
+            },
+            variance: {
+                type: Number,
+                default: 0
+            },
+        }]
+    ,
+
     /*  PONTOS DE RESPOSTA */
 
     excitedLevel: {

@@ -6,7 +6,7 @@ const Answer = require("../models/answer");
 const { listIndexes } = require("../models/room");
 const Participant = require("../models/participant");
 const authMiddlware = require('../middlewares/auth')
-
+const MomentService = require('../services/momentService')
 const router = express.Router();
 
 /*
@@ -90,12 +90,79 @@ router.get("/my", authMiddlware, async (req, res) => {
 router.get("/:roomPin", async (req, res) => {
     try {
         const pin = req.params.roomPin;
-        const room = await Room.findOne({ pin: pin });
+        const room = await Room.findOne({ pin: pin }).populate(`Moment`);
         if (room == undefined)
             return res.status(400).send({ error: "Room not found" })
 
         return res.json(room);
     } catch (err) {
+        return res.status(400).send({ error: "Error listing room detail" });
+    }
+});
+
+router.get("/data/:roomId", async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+        if (!roomId) return res.status(400).send({ error: `Please provide some id` })
+
+        const room = await Room.findById(roomId)
+        if (!room) return res.status(404).send({ error: `Room not found` })
+        const dataToReturn = {
+            room,
+            moments: [],
+            participantsAnswersData: []
+        }
+        const participants = await Participant.find({ roomPin: room.pin })
+        const moments = await Moment.find({ roomId: roomId });
+        await Promise.all(moments.map(async moment => {
+            const createdAtOptions = (moment.momentIndex + 1 === room.moments.length) ?
+                {
+                    "$gte": moment.createdAt
+                } :
+                {
+                    "$gte": moment.createdAt,
+                    "$lte": room.moments[moment.momentIndex + 1]
+                }
+
+            const answers = await Answer.find({
+                roomId: room._id,
+                createdAt: createdAtOptions
+            })
+            dataToReturn.moments.push({
+                moment, answers
+            })
+
+            participants.map(participant => {
+                const zIndexes = [...new Set(
+                    answers
+                        .filter(answer => answer.participant === `${participant._id}`)
+                        .map(answer => answer.zScore)
+                )]
+                if (zIndexes.length) {
+                    const x = MomentService.getFields({
+                        array: zIndexes,
+                        indexesToSearch: [0],
+                        maxQuestions: moment.questions.length
+                    })
+                    const y = MomentService.getFields({
+                        array: zIndexes,
+                        indexesToSearch: [0],
+                        maxQuestions: moment.questions.length
+                    })
+                    dataToReturn.participantsAnswersData.push({
+                        participant,
+                        zIndexes,
+                        x,
+                        y
+                    })
+                }
+            })
+        }))
+
+
+        return res.json(dataToReturn);
+    } catch (err) {
+        console.log(err)
         return res.status(400).send({ error: "Error listing room detail" });
     }
 });

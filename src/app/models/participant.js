@@ -1,7 +1,5 @@
 const mongoose = require("../../database");
 
-const bcrypt = require("bcryptjs");
-
 //O userSchema contem os campos do nosso banco na table Usuario
 const ParticipantSchema = new mongoose.Schema({
     name: {
@@ -9,7 +7,8 @@ const ParticipantSchema = new mongoose.Schema({
     },
     code: {
         type: String
-    }, roomPin: {
+    }, 
+    roomPin: {
         type: String
     },
     createdAt: {
@@ -17,7 +16,6 @@ const ParticipantSchema = new mongoose.Schema({
         default: Date.now
     }
 });
-
 
 
 //Apos definir o model user, declara como um Schema do Mongo

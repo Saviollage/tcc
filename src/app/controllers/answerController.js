@@ -4,6 +4,7 @@ const Answer = require("../models/answer");
 const Moment = require("../models/moment");
 const Participant = require("../models/participant");
 
+const MomentService = require('../services/momentService')
 const router = express.Router();
 
 router.post("/new", async (req, res) => {
@@ -39,6 +40,11 @@ router.post("/new", async (req, res) => {
 
         await room.save();
 
+        await MomentService.populateData({
+            momentId: moment._id,
+            roomId: room._id
+        })
+
         return res.send({ answer, message: "Answer recorded successfully" });
 
     } catch (err) {
@@ -70,20 +76,26 @@ router.post("/newList", async (req, res) => {
             var data = answer;
             data['roomId'] = roomId;
             data['participant'] = participant;
-
             await Answer.create(data);
         }
 
+        const moment = await Moment.findOne({
+            roomId: roomId,
+            createdAt: room.moments[room.moments.length - 1]
+        });
 
-        const moment = await Moment.findOne({ roomId: roomId, createdAt: room.moments[room.moments.length - 1] });
-
-        moment.totalAnswers += 1;
+        moment.totalAnswers++;
 
         await moment.save();
 
         room.quantAnswers++;
 
         await room.save();
+
+        await MomentService.populateData({
+            momentId: moment._id,
+            roomId: room._id
+        })
 
         return res.send({ message: `${answers.length} Answers recorded successfully` });
 
