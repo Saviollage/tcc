@@ -9,14 +9,6 @@ const authMiddlware = require('../middlewares/auth')
 const MomentService = require('../services/momentService')
 const router = express.Router();
 
-/*
-TODO:
-
-> ADICIONAR PIN PARA SALA (Gerar código 6)
-
-> VERIFICAR PARTICIPANTES DA SALA (PESSOAS QUE RESPONDERAM PARA AQUELA DETERMINADA SALA)
-*/
-
 function generatePinCode() {
     var value = Math.floor(Math.random() * 8999999 + 1000000);
     return value.toString();
@@ -146,7 +138,7 @@ router.get("/data/:roomId", async (req, res) => {
                     })
                     const y = MomentService.getFields({
                         array: zIndexes,
-                        indexesToSearch: [0],
+                        indexesToSearch: [1],
                         maxQuestions: moment.questions.length
                     })
                     dataToReturn.participantsAnswersData.push({

@@ -4,7 +4,6 @@ const User = require("../models/user");
 const Moment = require("../models/moment");
 const { mean, std, variance } = require('mathjs')
 
-
 class MomentService {
     static populateData = async ({ momentId, roomId }) => {
         const room = await Room.findById(roomId)
@@ -56,11 +55,14 @@ class MomentService {
     }
 
     static getFields = ({ array, indexesToSearch, maxQuestions }) => {
-        const total = 0
-        const sum = 0
+        let total = 0
+        let sum = 0
 
         array.forEach((item, index) => {
-            
+            if (indexesToSearch.includes(index % maxQuestions)) {
+                sum += item
+                total++
+            }
         })
 
         return sum / total
