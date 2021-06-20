@@ -106,7 +106,12 @@ router.get("/data/:roomId", async (req, res) => {
         }
         const participants = await Participant.find({ roomPin: room.pin })
         const moments = await Moment.find({ roomId: roomId });
+
         await Promise.all(moments.map(async moment => {
+            await MomentService.populateData({
+                momentId: moment._id,
+                roomId: room._id
+            })
             const createdAtOptions = (moment.momentIndex + 1 === room.moments.length) ?
                 {
                     "$gte": moment.createdAt

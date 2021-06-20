@@ -65,7 +65,7 @@ class MomentService {
             }
         })
 
-        return sum / total
+        return (total > 0) ? (sum / total) : 0
     }
 }
 
