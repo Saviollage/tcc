@@ -22,6 +22,15 @@ const RoomSchema = new mongoose.Schema({
         type: String
     },
 
+    minInterval: {
+        type: Number,
+        default: 15
+    },
+
+    maxInterval: {
+        type: Number,
+        default: 60
+    },
 
     createdBy: {
         type: String
@@ -33,7 +42,7 @@ const RoomSchema = new mongoose.Schema({
     },
 
     quantParticipants: {
-        type: Number, 
+        type: Number,
         default: 0
     },
 

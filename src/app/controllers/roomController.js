@@ -199,6 +199,28 @@ router.delete("/:roomId", async (req, res) => {
 });
 
 // DETALHAR SALA
+router.put("/edit", async (req, res) => {
+    try {
+        const id = req.body.roomId;
+        const room = await Room.findById(id);
+        if (room == undefined)
+            return res.status(400).send({ error: "Room not found" })
+        const { name, minInterval, maxInterval } = req.body
+
+        if (name !== undefined) room.name = name
+        if (minInterval !== undefined) room.minInterval = minInterval
+        if (maxInterval !== undefined) room.maxInterval = maxInterval
+
+        await room.save();
+
+        return res.send({ message: "Room edited" });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({ error: "Error edting room" });
+    }
+});
+
+// DETALHAR SALA
 router.get("/activate/:roomId", async (req, res) => {
     try {
         const id = req.params.roomId;
